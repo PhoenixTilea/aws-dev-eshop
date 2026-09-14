@@ -9,11 +9,11 @@ Note that while I'm following the modules, I want this to also be a sample of ho
 ## Current State
 
 - [x] Phase 1: Basic CRUD API with Lambda and API Gateway, persistent storage with DynamoDB, basic testing and error handling
-- [] Phase 2
-- [] Phase 3
-- [] Phase 4
-- [] Phase 5
-- [] Phase 6
+- [ ] Phase 2
+- [ ] Phase 3
+- [ ] Phase 4
+- [ ] Phase 5
+- [ ] Phase 6
 
 ## AWS Services Used
 
@@ -60,10 +60,10 @@ aws login
 cdk bootstrap
 
 # Synthesize the templates without deploying
-cdk synth ProductsDbStack, ProductsApiStack
+cdk synth --all
 
 # Deploy the stacks (Might need to answer 'y' to a prompt)
-cdk deploy ProductsDbStack, ProductsApiStack
+cdk deploy --all
 ```
 
 From here, I recommend copying the `ProductsApiUrl` output for the API gateway endpoint (should end in `/dev/`). You'll need it for the Swagger page below, or if you want to test the API using CURL or another API client.
