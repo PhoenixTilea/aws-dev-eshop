@@ -1,5 +1,7 @@
 allowBuilds:
   "@parcel/watcher": true
+  # Usage telemetry pulled in by swagger-ui-dist; nothing needs it to run.
+  "@scarf/scarf": false
   "@swc/core": true
   cpu-features: true
   esbuild: true

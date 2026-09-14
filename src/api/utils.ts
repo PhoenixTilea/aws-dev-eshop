@@ -2,6 +2,7 @@ import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { ZodType, infer as zInfer } from "zod";
 import { prettifyError, treeifyError } from "zod";
 
+import { CORS_HEADERS } from "./constants";
 import { ApiError, badRequest, describeError, toApiError } from "./errors";
 
 export const createResponse = (
@@ -13,9 +14,7 @@ export const createResponse = (
   body: body ? JSON.stringify(body) : "",
   headers: {
     "Content-Type": "application/json",
-    "access-control-allow-origin": "*",
-    "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "access-control-allow-headers": "Content-Type",
+    ...CORS_HEADERS,
     ...headers
   }
 });

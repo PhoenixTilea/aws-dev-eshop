@@ -1,12 +1,10 @@
-import { z } from "zod";
-
 import { updateProduct } from "../dbClient";
 import { notFound } from "../errors";
-import { ProductUpdateData } from "../types";
+import { ProductId, ProductUpdateData } from "../types";
 import { createResponse, parseBody, parseParam, withErrorHandling } from "../utils";
 
 export const handler = withErrorHandling(async event => {
-  const id = parseParam(z.uuid(), event.pathParameters?.id, "id");
+  const id = parseParam(ProductId, event.pathParameters?.id, "id");
   const data = parseBody(ProductUpdateData, event);
   const updated = await updateProduct(id, data);
   if (!updated) {

@@ -11,7 +11,7 @@ exports[`ProductsDbStack > matches the committed snapshot 1`] = `
   },
   "Resources": {
     "ProductsTable241ADBFF": {
-      "DeletionPolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AttributeDefinitions": [
           {
@@ -61,7 +61,7 @@ exports[`ProductsDbStack > matches the committed snapshot 1`] = `
         "TableName": "Products",
       },
       "Type": "AWS::DynamoDB::GlobalTable",
-      "UpdateReplacePolicy": "Retain",
+      "UpdateReplacePolicy": "Delete",
     },
   },
   "Rules": {

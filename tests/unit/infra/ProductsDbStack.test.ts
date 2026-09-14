@@ -1,9 +1,9 @@
-import { App } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME } from "../../../src/api/constants";
 import { ProductsDbStack } from "../../../src/api/ProductsDbStack";
+import { makeApp } from "../../helpers/cdk";
 
 // TableV2 synthesizes AWS::DynamoDB::GlobalTable, not AWS::DynamoDB::Table.
 const TABLE = "AWS::DynamoDB::GlobalTable";
@@ -12,7 +12,7 @@ describe("ProductsDbStack", () => {
   let template: Template;
 
   beforeAll(() => {
-    const app = new App();
+    const app = makeApp();
     const stack = new ProductsDbStack(app, "TestProductsDbStack", {
       env: { account: "123456789012", region: "eu-west-1" }
     });
@@ -46,10 +46,10 @@ describe("ProductsDbStack", () => {
     });
   });
 
-  it("retains the table if the stack goes away", () => {
+  it("deletes the table when the stack is destroyed", () => {
     template.hasResource(TABLE, {
-      DeletionPolicy: "Retain",
-      UpdateReplacePolicy: "Retain"
+      DeletionPolicy: "Delete",
+      UpdateReplacePolicy: "Delete"
     });
   });
 

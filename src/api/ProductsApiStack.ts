@@ -1,17 +1,23 @@
 import type { StackProps } from "aws-cdk-lib";
 import { CfnOutput, Stack } from "aws-cdk-lib";
-import { LambdaIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { IResource } from "aws-cdk-lib/aws-apigateway";
+import { LambdaIntegration, ResponseType, RestApi } from "aws-cdk-lib/aws-apigateway";
 import type { TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import type { Construct } from "constructs";
 import { join } from "path";
 
+import { CORS_HEADERS } from "./constants";
+import { productRoutes } from "./products/routes";
+
 const settings = (filename: string) => ({
   entry: join(__dirname, "products", `${filename}.ts`),
   handler: "handler",
   runtime: Runtime.NODEJS_24_X
 });
+
+const constructId = (handler: string) => `${handler.charAt(0).toUpperCase()}${handler.slice(1)}`;
 
 type Props = StackProps & {
   productsTable: TableV2;
@@ -23,32 +29,37 @@ export class ProductsApiStack extends Stack {
 
     const { productsTable } = props;
 
-    const getProducts = new NodejsFunction(this, "GetProducts", settings("getProducts"));
-    productsTable.grants.readData(getProducts);
-    const getProduct = new NodejsFunction(this, "GetProduct", settings("getProduct"));
-    productsTable.grants.readData(getProduct);
-    const addProduct = new NodejsFunction(this, "AddProduct", settings("addProduct"));
-    productsTable.grants.readWriteData(addProduct);
-    const updateProduct = new NodejsFunction(this, "UpdateProduct", settings("updateProduct"));
-    productsTable.grants.readWriteData(updateProduct);
-    const options = new NodejsFunction(this, "Options", settings("options"));
-
     const api = new RestApi(this, "ProductsApi", {
       deployOptions: {
         stageName: "dev"
       }
     });
 
-    const products = api.root.addResource("products");
-    products.addMethod("GET", new LambdaIntegration(getProducts));
-    products.addMethod("POST", new LambdaIntegration(addProduct));
-    products.addMethod("OPTIONS", new LambdaIntegration(options));
+    const gatewayCorsHeaders = Object.fromEntries(
+      Object.entries(CORS_HEADERS).map(([name, value]) => [name, `'${value}'`])
+    );
+    api.addGatewayResponse("Default4xx", { type: ResponseType.DEFAULT_4XX, responseHeaders: gatewayCorsHeaders });
+    api.addGatewayResponse("Default5xx", { type: ResponseType.DEFAULT_5XX, responseHeaders: gatewayCorsHeaders });
 
-    const productById = products.addResource("{id}");
-    productById.addMethod("GET", new LambdaIntegration(getProduct));
-    productById.addMethod("PUT", new LambdaIntegration(updateProduct));
-    productById.addMethod("OPTIONS", new LambdaIntegration(options));
+    const resources = new Map<string, IResource>();
+    for (const route of productRoutes) {
+      const fn = new NodejsFunction(this, constructId(route.handler), settings(route.handler));
+      if (route.tableAccess === "readWrite") {
+        productsTable.grants.readWriteData(fn);
+      } else {
+        productsTable.grants.readData(fn);
+      }
 
-    new CfnOutput(this, "ProductsApiOutput", { value: api.url });
+      const resource = api.root.resourceForPath(route.path);
+      resources.set(route.path, resource);
+      resource.addMethod(route.method, new LambdaIntegration(fn));
+    }
+
+    const options = new NodejsFunction(this, "Options", settings("options"));
+    for (const resource of resources.values()) {
+      resource.addMethod("OPTIONS", new LambdaIntegration(options));
+    }
+
+    new CfnOutput(this, "ProductsApiUrl", { value: api.url });
   }
 }

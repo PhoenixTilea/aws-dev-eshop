@@ -25,10 +25,12 @@ Note that while I'm following the modules, I want this to also be a sample of ho
 ## Tech Stack
 
 - Language and Environment: TypeScript, Node
+- Package Manager: PNPM
 - SDKs: AWS SDK for JavaScript, AWS CDK Lib
 - Validation: Zod
 - Testing: Vitest, TestContainers (for integration tests with docker images)
 - Linting and Formatting: EsLint, Prettier
+- Tools: Swagger/OpenAPI
 
 ## Run it Yourself
 
@@ -64,7 +66,44 @@ cdk synth ProductsDbStack, ProductsApiStack
 cdk deploy ProductsDbStack, ProductsApiStack
 ```
 
-From here, I recommend copying the output for the API gateway endpoint (should end in `/dev/`). You'll need it if you want to test the API using CURL or another API client.
+From here, I recommend copying the `ProductsApiUrl` output for the API gateway endpoint (should end in `/dev/`). You'll need it for the Swagger page below, or if you want to test the API using CURL or another API client.
+
+### Try the Deployed API with Swagger
+
+There's a small Express server in `tools/swagger` that serves a Swagger page for the deployed API. The spec is generated from the route contracts and Zod schemas in `src/api`, so it stays in sync as routes get added. "Try it out" requests go straight from your browser to API Gateway.
+
+The server needs to know where the API lives, so set `API_BASE_URL` to the `ProductsApiUrl` output first. The easiest way is a `.env` file in the project root (it's gitignored):
+
+```Bash
+API_BASE_URL=https://abc123.execute-api.us-east-1.amazonaws.com/dev/
+```
+
+Or set it in your shell for the current session:
+
+```Bash
+# Bash
+export API_BASE_URL=https://abc123.execute-api.us-east-1.amazonaws.com/dev/
+
+# PowerShell
+$env:API_BASE_URL = "https://abc123.execute-api.us-east-1.amazonaws.com/dev/"
+```
+
+If you've lost the URL, you can get it back from the stack outputs:
+
+```Bash
+aws cloudformation describe-stacks --stack-name ProductsApiStack --query "Stacks[0].Outputs"
+```
+
+Then launch the docs server:
+
+```Bash
+# Serves the docs at http://localhost:4000/docs (set PORT to use a different port)
+# Restarts automatically when you change a route or schema
+pnpm swagger
+
+# Or write the spec to openapi.json, to import into an API client 
+pnpm spec
+```
 
 ### Testing
 
@@ -78,69 +117,3 @@ pnpm test:integration
 # Get coverage report
 pnpm test:coverage
 ```
-
-I don't yet have a fancy Swagger setup or anything for this, so if you want to test the real API, you'll want to use CURL or an API client like Postman or Yaak.
-
-## API
-
-Base URL: The endpoint output from the ProductsApiStack deployment.
-
-### GET /products
-
-Get all products in the catalog.
-
-- Response: [Product](#Product)\[\]
-
-### GET /product?category=
-
-Get all products in a specific category.
-
-- Query:
-  - category: [Category](#Category)
-- Response: [Product](#Product)\[\]
-
-### GET /products/{id}
-
-Get a single product by ID.
-
-- Path:
-  - id: UUID
-- Response: [Product](#Product)
-
-### POST /products
-
-Add a new product to the catalog.
-
-- Body: [ProductCreateData](#ProductCreateData)
-- Response: [Product](#Product)
-
-### PUT /products/{id}
-
-Update a single product by ID.
-
-- Path:
-  - id: UUID
-- Body: [ProductUpdateData](#ProductUpdateData)
-- Response: [Product](#Product)
-
-## Schemas
-
-### Category
-
-Enum: "Arrows", "Masks", "Potions", "Shields"
-
-### Product
-
-- id: UUID, auto-generated on create
-- title: String, 1 to 200 characters
-- description: String, 1 to 1000 characters
-- category: [Category](#Category)
-- price: Integer, must be greater than 0
-
-### ProductCreateData
-
-[Product](#Product) with `id` omitted.
-
-### ProductUpdateData
-
-[Product](#Product) with `id` and `category` omitted.

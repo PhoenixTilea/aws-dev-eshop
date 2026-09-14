@@ -24,6 +24,6 @@
     "isolatedModules": true,
     "types": ["node"]
   },
-  "include": ["src", "tests", "vitest.config.mts", "eslint.config.mjs"],
+  "include": ["src", "tests", "tools", "vitest.config.mts", "eslint.config.mjs"],
   "exclude": ["node_modules", "cdk.out"]
 }

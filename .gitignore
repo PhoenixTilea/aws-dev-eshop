@@ -4,3 +4,9 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+# Local settings, e.g. API_BASE_URL for the Swagger server
+.env
+
+# Written by `pnpm spec`
+openapi.json
