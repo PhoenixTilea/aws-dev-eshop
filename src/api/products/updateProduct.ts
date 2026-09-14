@@ -1,23 +1,16 @@
-import type { APIGatewayEvent } from "aws-lambda";
 import { z } from "zod";
 
 import { updateProduct } from "../dbClient";
+import { notFound } from "../errors";
 import { ProductUpdateData } from "../types";
-import { createErrorResponse, createResponse } from "../utils";
+import { createResponse, parseBody, parseParam, withErrorHandling } from "../utils";
 
-export const handler = async (event: APIGatewayEvent) => {
-  const id = z.uuid().parse(event.pathParameters?.id);
-  let data: ProductUpdateData;
-  try {
-    data = ProductUpdateData.parse(JSON.parse(event.body ?? ""));
-  } catch (err) {
-    return createErrorResponse(err);
+export const handler = withErrorHandling(async event => {
+  const id = parseParam(z.uuid(), event.pathParameters?.id, "id");
+  const data = parseBody(ProductUpdateData, event);
+  const updated = await updateProduct(id, data);
+  if (!updated) {
+    throw notFound(`Product with ID ${id} does not exist.`);
   }
-
-  try {
-    const updated = await updateProduct(id, data);
-    return createResponse(200, updated);
-  } catch (err) {
-    return createResponse(500, { message: (err as Error).message });
-  }
-}
+  return createResponse(200, updated);
+});

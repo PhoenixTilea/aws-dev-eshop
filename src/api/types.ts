@@ -1,25 +1,26 @@
-import { z } from "zod";
+import type { infer as zInfer } from "zod";
+import { strictObject, string, uuid, enum as zEnum, number as zNumber } from "zod";
 
 export const Category = {
   Arrows: "Arrows",
   Masks: "Masks",
   Potions: "Potions",
-  Shields: "Sheilds"
+  Shields: "Shields"
 } as const;
-export const CategorySchema = z.enum(Category);
+export const CategorySchema = zEnum(Category);
 export type Category = typeof Category[keyof typeof Category];
 
-export const Product = z.strictObject({
-  id: z.uuid(),
-  title: z.string().min(1).max(200),
-  description: z.string().nonempty(),
-  price: z.number().int().positive(),
+export const Product = strictObject({
+  id: uuid(),
+  title: string().min(1).max(200),
+  description: string().nonempty(),
+  price: zNumber().int().positive(),
   category: CategorySchema
 });
-export type Product = z.infer<typeof Product>;
+export type Product = zInfer<typeof Product>;
 
 export const ProductCreateData = Product.omit({ id: true });
-export type ProductCreateData = z.infer<typeof ProductCreateData>;
+export type ProductCreateData = zInfer<typeof ProductCreateData>;
 
 export const ProductUpdateData = Product.omit({ id: true, category: true });
-export type ProductUpdateData = z.infer<typeof ProductUpdateData>;
+export type ProductUpdateData = zInfer<typeof ProductUpdateData>;
