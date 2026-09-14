@@ -2,10 +2,7 @@
   "app": "npx tsc && npx tsx src/app.ts",
   "watch": {
     "include": ["src"],
-    "exclude": [
-      "**/*.d.ts",
-      "**/*.js"
-    ]
+    "exclude": ["**/*.d.ts", "**/*.js"]
   },
   "context": {
     "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": true,

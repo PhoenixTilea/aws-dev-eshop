@@ -1,10 +1,11 @@
-import { CfnOutput, Stack, type StackProps } from "aws-cdk-lib";
+import type { StackProps } from "aws-cdk-lib";
+import { CfnOutput, Stack } from "aws-cdk-lib";
 import { LambdaIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import type { Construct } from "constructs";
 import { join } from "path";
-import type { TableV2 } from "aws-cdk-lib/aws-dynamodb";
 
 const settings = (filename: string) => ({
   entry: join(__dirname, "products", `${filename}.ts`),
@@ -13,7 +14,7 @@ const settings = (filename: string) => ({
 });
 
 type Props = StackProps & {
-  productsTable: TableV2
+  productsTable: TableV2;
 };
 
 export class ProductsApiStack extends Stack {

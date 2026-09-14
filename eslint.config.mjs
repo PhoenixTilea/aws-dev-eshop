@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint";
 // @type {import("eslint").Linter.Config[]}
 
 export const config = tseslint.config([
-  globalIgnores(["node_modules/**", "cdk.out/**"]),
+  globalIgnores(["node_modules/**", "cdk.out/**", "coverage/**"]),
   {
     plugins: {
       "import-x": importX,

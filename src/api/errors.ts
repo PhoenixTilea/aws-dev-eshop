@@ -97,14 +97,14 @@ export const describeError = (err: ApiError) => {
     cause:
       cause instanceof Error
         ? {
-          name: cause.name,
-          message: cause.message,
-          stack: cause.stack,
-          // Present only on SDK errors; requestId is what AWS support asks for.
-          requestId: isService ? cause.$metadata.requestId : undefined,
-          httpStatusCode: isService ? cause.$metadata.httpStatusCode : undefined,
-          attempts: isService ? cause.$metadata.attempts : undefined
-        }
+            name: cause.name,
+            message: cause.message,
+            stack: cause.stack,
+            // Present only on SDK errors; requestId is what AWS support asks for.
+            requestId: isService ? cause.$metadata.requestId : undefined,
+            httpStatusCode: isService ? cause.$metadata.httpStatusCode : undefined,
+            attempts: isService ? cause.$metadata.attempts : undefined
+          }
         : cause
   };
 };

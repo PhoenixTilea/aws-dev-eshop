@@ -1,8 +1,9 @@
-import { CfnOutput, Stack, type StackProps } from "aws-cdk-lib";
+import type { StackProps } from "aws-cdk-lib";
+import { Stack } from "aws-cdk-lib";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import type { Construct } from "constructs";
 
-import { PRODUCTS_TABLE_NAME, PRODUCTS_TABLE_CATEGORY_INDEX } from "./constants";
+import { PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME } from "./constants";
 
 export class ProductsDbStack extends Stack {
   readonly productsTable: TableV2;
