@@ -1,9 +1,5 @@
 import type { infer as zInfer } from "zod";
-import { array, object, strictObject, string, unknown, uuid, enum as zEnum, number as zNumber } from "zod";
-
-// `.meta({ id })` names a schema as a reusable component in the OpenAPI spec;
-// `description` and `examples` show up in the docs and seed Swagger's "Try it out".
-// None of it changes how a schema validates.
+import { array, object, strictObject, string, unknown, url, uuid, enum as zEnum, number as zNumber } from "zod";
 
 export const Category = {
   Arrows: "Arrows",
@@ -32,7 +28,8 @@ export const Product = strictObject({
     .int()
     .positive()
     .meta({ examples: [25] }),
-  category: CategorySchema
+  category: CategorySchema,
+  images: string().array().optional().meta({ description: "List of S3 object keys of images for this product." })
 }).meta({ id: "Product" });
 export type Product = zInfer<typeof Product>;
 
@@ -44,7 +41,16 @@ export type ProductCreateData = zInfer<typeof ProductCreateData>;
 export const ProductUpdateData = Product.omit({ id: true, category: true }).meta({ id: "ProductUpdateData" });
 export type ProductUpdateData = zInfer<typeof ProductUpdateData>;
 
-/** The body withErrorHandling sends for every error response. */
+export const UploadProductImageData = strictObject({
+  filename: string().min(1).max(50)
+}).meta({ id: "UploadProductImageData" });
+export type UploadProductImageData = zInfer<typeof UploadProductImageData>;
+
+export const UploadProductImageResponse = strictObject({
+  url: url()
+});
+export type UploadProductImageResponse = zInfer<typeof UploadProductImageResponse>;
+
 export const ErrorResponse = object({
   message: string().meta({ examples: ["Product with ID 7f3b9d1e-2c4a-4f6b-8d5e-1a2b3c4d5e6f does not exist."] }),
   details: unknown()

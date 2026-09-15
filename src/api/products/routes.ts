@@ -1,7 +1,8 @@
+import type { ZodSchema } from "zod";
 import { object } from "zod";
 
-import { commonErrors, json } from "../routes";
 import type { RouteContract } from "../routes";
+import { commonErrors, json } from "../routes";
 import {
   CategorySchema,
   ErrorResponse,
@@ -9,10 +10,12 @@ import {
   ProductCreateData,
   ProductId,
   ProductList,
-  ProductUpdateData
+  ProductUpdateData,
+  UploadProductImageData,
+  UploadProductImageResponse
 } from "../types";
 
-const body = (schema: typeof ProductCreateData | typeof ProductUpdateData) => ({
+const body = (schema: ZodSchema) => ({
   required: true,
   content: { "application/json": { schema } }
 });
@@ -85,6 +88,24 @@ export const productRoutes: RouteContract[] = [
         400: json("The id is not a UUID, or the body fails validation.", ErrorResponse),
         404: json("No product has this id.", ErrorResponse),
         413: json("The product data is too large to store.", ErrorResponse),
+        ...commonErrors
+      }
+    }
+  },
+  {
+    method: "PUT",
+    path: "/products/{id}/images",
+    handler: "uploadProductImage",
+    tableAccess: "read",
+    operation: {
+      summary: "Request product image upload",
+      description: "Returns a presigned upload URL for a product image.",
+      requestParams: byId,
+      requestBody: body(UploadProductImageData),
+      responses: {
+        200: json("The updated product.", UploadProductImageResponse),
+        400: json("The id is not a UUID, or the body fails validation.", ErrorResponse),
+        404: json("No product has this id.", ErrorResponse),
         ...commonErrors
       }
     }

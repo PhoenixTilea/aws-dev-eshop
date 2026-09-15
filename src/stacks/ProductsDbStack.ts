@@ -3,7 +3,7 @@ import { Stack } from "aws-cdk-lib";
 import { AttributeType, Billing, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import type { Construct } from "constructs";
 
-import { PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME } from "./constants";
+import { PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME } from "../api/constants";
 
 export class ProductsDbStack extends Stack {
   readonly productsTable: TableV2;

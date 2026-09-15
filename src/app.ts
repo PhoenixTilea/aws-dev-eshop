@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib/core";
 
-import { ProductsApiStack } from "./api/ProductsApiStack";
-import { ProductsDbStack } from "./api/ProductsDbStack";
+import { ProductsApiStack } from "./stacks/ProductsApiStack";
+import { ProductsDbStack } from "./stacks/ProductsDbStack";
 import { destroyOnTeardown } from "./removalPolicies";
 
 const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION };

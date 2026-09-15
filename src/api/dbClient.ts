@@ -8,12 +8,10 @@ import {
   UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
 
-import { PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME as TableName } from "./constants";
+import { PRODUCTS_BUCKET_NAME, PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME as TableName } from "./constants";
+import { getDownloadUrl } from "./s3Client";
 import type { Category, Product, ProductCreateData, ProductUpdateData } from "./types";
 
-// AWS_ENDPOINT_URL points the client at DynamoDB Local (or LocalStack) during
-// integration tests. In Lambda it is unset and the SDK resolves the real regional
-// endpoint. Built lazily so a test can set the variable before the first call.
 let client: DynamoDBDocumentClient | undefined;
 
 const docClient = () => {
@@ -42,7 +40,7 @@ export const getProduct = async (id: string) => {
     ConsistentRead: true
   });
   const response = await docClient().send(command);
-  return response.Item ? (response.Item as Product) : null;
+  return response.Item ? (convertProductImageUrls([response.Item as Product])) : null;
 };
 
 export const getProducts = async (category?: Category) => {
@@ -54,7 +52,7 @@ export const getProducts = async (category?: Category) => {
       ExpressionAttributeValues: { ":c": category }
     });
     const response = await docClient().send(command);
-    return response.Items ? (response.Items as Product[]) : [];
+    return response.Items ? (convertProductImageUrls(response.Items as Product[])) : [];
   } else {
     const command = new ScanCommand({
       TableName,
@@ -65,14 +63,6 @@ export const getProducts = async (category?: Category) => {
   }
 };
 
-/**
- * Updates an existing product, or returns null if there is no such product.
- *
- * UpdateCommand creates the item when the key is absent, which would let a PUT
- * to an unknown id silently invent a product. The condition blocks that, and
- * does so atomically: a read-then-write would leave a window in which the
- * product could be deleted between the check and the update.
- */
 export const updateProduct = async (id: string, product: ProductUpdateData) => {
   const command = new UpdateCommand({
     TableName,
@@ -89,14 +79,52 @@ export const updateProduct = async (id: string, product: ProductUpdateData) => {
 
   try {
     const response = await docClient().send(command);
-    return response.Attributes as Product;
+    return convertProductImageUrls([response.Attributes as Product]);
   } catch (err) {
-    // Existence is the only condition on this command, so a failed check can
-    // only mean the product is not there. Callers that set a second predicate
-    // (an optimistic-locking version, say) would have to tell the two apart.
     if (err instanceof ConditionalCheckFailedException) {
       return null;
     }
     throw err;
   }
 };
+
+export const updateProductImages = async (id: string, images: string[]) => {
+  const command = new UpdateCommand({
+    TableName,
+    Key: { id },
+    ConditionExpression: "attribute_exists(id)",
+    UpdateExpression: "SET images = list_append(if_not_exists(images, :empty), :images)",
+    ExpressionAttributeValues: {
+      ":empty": [],
+      ":images": images
+    }
+  });
+  await docClient().send(command);
+}
+
+const convertProductImageUrls = async (products: Product[]) => {
+  const promises: (() => Promise<{ id: string, url: string }>)[] = [];
+  for (const product of products) {
+    if (!product.images?.length) {
+      continue;
+    }
+    for (const image of product.images) {
+      promises.push(async () => {
+        const url = await getDownloadUrl(PRODUCTS_BUCKET_NAME, image);
+        return { id: product.id, url };
+      });
+    }
+  }
+
+  const urls = await Promise.all(promises.map(p => p()));
+  const productDownloadUrls = new Map<string, string[]>();
+  for (const { id, url } of urls) {
+    const list = productDownloadUrls.get(id) ?? [];
+    productDownloadUrls.set(id, [...list, url]);
+  }
+
+  return products.map(p => ({
+    ...p,
+    images: productDownloadUrls.get(p.id) ?? []
+  }));
+}

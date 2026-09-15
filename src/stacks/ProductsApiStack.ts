@@ -8,8 +8,8 @@ import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import type { Construct } from "constructs";
 import { join } from "path";
 
-import { CORS_HEADERS } from "./constants";
-import { productRoutes } from "./products/routes";
+import { CORS_HEADERS } from "../api/constants";
+import { productRoutes } from "../api/products/routes";
 
 const settings = (filename: string) => ({
   entry: join(__dirname, "products", `${filename}.ts`),
