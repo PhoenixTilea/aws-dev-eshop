@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { PRODUCTS_BUCKET_NAME } from "../../../src/api/constants";
-import { getProduct } from "../../../src/api/dbClient";
+import { PRODUCTS_BUCKET_NAME } from "../../../src/constants";
+import { getProduct } from "../../../src/clients/dbClient";
 import { handler } from "../../../src/api/products/uploadProductImage";
-import { getUploadUrl } from "../../../src/api/s3Client";
+import { getUploadUrl } from "../../../src/clients/s3Client";
 import { Category } from "../../../src/api/types";
 import type { Product } from "../../../src/api/types";
 import { makeEvent } from "../../helpers/apiGateway";
 
-vi.mock("../../../src/api/dbClient");
-vi.mock("../../../src/api/s3Client");
+vi.mock("../../../src/clients/dbClient");
+vi.mock("../../../src/clients/s3Client");
 
 const getProductMock = vi.mocked(getProduct);
 const getUploadUrlMock = vi.mocked(getUploadUrl);
@@ -37,7 +37,7 @@ const validBody = { contentType: "image/jpeg", filename: "Wooden Shield.jpg" };
 describe("uploadProductImage handler", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => { });
     getProductMock.mockResolvedValue(potion);
     getUploadUrlMock.mockResolvedValue(signedUrl);
   });

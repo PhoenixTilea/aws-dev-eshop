@@ -1,7 +1,7 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import { PRESIGNED_DOWNLOAD_EXPIRE_SECONDS, PRESIGNED_UPLOAD_EXPIRE_SECONDS } from "./constants";
+import { PRESIGNED_DOWNLOAD_EXPIRE_SECONDS, PRESIGNED_UPLOAD_EXPIRE_SECONDS } from "../constants";
 
 const client = new S3Client({});
 

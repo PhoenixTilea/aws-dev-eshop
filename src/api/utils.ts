@@ -2,7 +2,7 @@ import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import type { ZodType, infer as zInfer } from "zod";
 import { prettifyError, treeifyError } from "zod";
 
-import { CORS_HEADERS } from "./constants";
+import { CORS_HEADERS } from "../constants";
 import { ApiError, badRequest, describeError, toApiError } from "./errors";
 
 export const createResponse = (
@@ -26,25 +26,25 @@ export const createResponse = (
  */
 export const withErrorHandling =
   (handler: (event: APIGatewayEvent) => Promise<APIGatewayProxyResult>) =>
-  async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-    try {
-      return await handler(event);
-    } catch (err) {
-      const apiError = toApiError(err);
-      console.error(
-        JSON.stringify({
-          level: apiError.statusCode >= 500 ? "ERROR" : "WARN",
-          route: `${event.httpMethod} ${event.path}`,
-          ...describeError(apiError)
-        })
-      );
-      return createResponse(
-        apiError.statusCode,
-        { message: apiError.message, ...(apiError.details ? { details: apiError.details } : {}) },
-        apiError.retryable ? { "retry-after": "1" } : {}
-      );
-    }
-  };
+    async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+      try {
+        return await handler(event);
+      } catch (err) {
+        const apiError = toApiError(err);
+        console.error(
+          JSON.stringify({
+            level: apiError.statusCode >= 500 ? "ERROR" : "WARN",
+            route: `${event.httpMethod} ${event.path}`,
+            ...describeError(apiError)
+          })
+        );
+        return createResponse(
+          apiError.statusCode,
+          { message: apiError.message, ...(apiError.details ? { details: apiError.details } : {}) },
+          apiError.retryable ? { "retry-after": "1" } : {}
+        );
+      }
+    };
 
 const parseOrThrow = <T extends ZodType>(schema: T, value: unknown, message: string): zInfer<T> => {
   const result = schema.safeParse(value);

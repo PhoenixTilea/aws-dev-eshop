@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getProduct } from "../../../src/api/dbClient";
+import { getProduct } from "../../../src/clients/dbClient";
 import { handler } from "../../../src/api/products/getProduct";
 import { Category } from "../../../src/api/types";
 import type { Product } from "../../../src/api/types";
 import { makeEvent } from "../../helpers/apiGateway";
 
-vi.mock("../../../src/api/dbClient");
+vi.mock("../../../src/clients/dbClient");
 
 const getProductMock = vi.mocked(getProduct);
 
@@ -27,7 +27,7 @@ const getEvent = (id: string | null) =>
 describe("getProduct handler", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => { });
   });
 
   it("returns 200 and the product when it exists", async () => {

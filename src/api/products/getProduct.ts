@@ -1,4 +1,4 @@
-import { getProduct } from "../dbClient";
+import { getProduct } from "../../clients/dbClient";
 import { notFound } from "../errors";
 import { ProductId } from "../types";
 import { createResponse, parseParam, withErrorHandling } from "../utils";

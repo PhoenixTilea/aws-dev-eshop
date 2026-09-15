@@ -10,15 +10,15 @@ import {
 import { mockClient } from "aws-sdk-client-mock";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { PRODUCTS_BUCKET_NAME, PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME } from "../../src/api/constants";
-import { addProduct, getProduct, getProducts, updateProduct, updateProductImages } from "../../src/api/dbClient";
-import { getDownloadUrl } from "../../src/api/s3Client";
+import { PRODUCTS_BUCKET_NAME, PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME } from "../../src/constants";
+import { addProduct, getProduct, getProducts, updateProduct, updateProductImages } from "../../src/clients/dbClient";
+import { getDownloadUrl } from "../../src/clients/s3Client";
 import { Category } from "../../src/api/types";
 import type { Product } from "../../src/api/types";
 
 // Presigning is exercised in s3Client.test.ts; here it only needs to be
 // observable and deterministic.
-vi.mock("../../src/api/s3Client");
+vi.mock("../../src/clients/s3Client");
 
 const getDownloadUrlMock = vi.mocked(getDownloadUrl);
 

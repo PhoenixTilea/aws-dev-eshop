@@ -1,4 +1,4 @@
-import { updateProduct } from "../dbClient";
+import { updateProduct } from "../../clients/dbClient";
 import { notFound } from "../errors";
 import { ProductId, ProductUpdateData } from "../types";
 import { createResponse, parseBody, parseParam, withErrorHandling } from "../utils";

@@ -1,13 +1,13 @@
 import { ProvisionedThroughputExceededException } from "@aws-sdk/client-dynamodb";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { addProduct } from "../../../src/api/dbClient";
+import { addProduct } from "../../../src/clients/dbClient";
 import { handler } from "../../../src/api/products/addProduct";
 import { Category } from "../../../src/api/types";
 import type { Product, ProductCreateData } from "../../../src/api/types";
 import { makeEvent } from "../../helpers/apiGateway";
 
-vi.mock("../../../src/api/dbClient");
+vi.mock("../../../src/clients/dbClient");
 
 const addProductMock = vi.mocked(addProduct);
 
@@ -27,7 +27,7 @@ const postJson = (body: unknown) => postEvent(JSON.stringify(body));
 describe("addProduct handler", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => { });
   });
 
   it("returns 201 and the created product, id included", async () => {

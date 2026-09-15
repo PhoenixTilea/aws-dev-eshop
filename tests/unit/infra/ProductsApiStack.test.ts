@@ -1,7 +1,7 @@
 import { Template } from "aws-cdk-lib/assertions";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { CORS_HEADERS } from "../../../src/api/constants";
+import { CORS_HEADERS } from "../../../src/constants";
 import { productRoutes } from "../../../src/api/products/routes";
 import { ProductsApiStack } from "../../../src/stacks/ProductsApiStack";
 import { ProductsDbStack } from "../../../src/stacks/ProductsDbStack";

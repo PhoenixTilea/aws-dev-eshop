@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { updateProduct } from "../../../src/api/dbClient";
+import { updateProduct } from "../../../src/clients/dbClient";
 import { handler } from "../../../src/api/products/updateProduct";
 import { Category } from "../../../src/api/types";
 import type { Product } from "../../../src/api/types";
 import { makeEvent } from "../../helpers/apiGateway";
 
-vi.mock("../../../src/api/dbClient");
+vi.mock("../../../src/clients/dbClient");
 
 const updateProductMock = vi.mocked(updateProduct);
 
@@ -35,7 +35,7 @@ const putEvent = (id: string, body: unknown = edit) =>
 describe("updateProduct handler", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => { });
   });
 
   it("returns 200 and the updated product", async () => {

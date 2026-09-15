@@ -1,4 +1,4 @@
-import { addProduct } from "../dbClient";
+import { addProduct } from "../../clients/dbClient";
 import { ProductCreateData } from "../types";
 import { createResponse, parseBody, withErrorHandling } from "../utils";
 

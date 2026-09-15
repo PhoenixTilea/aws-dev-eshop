@@ -1,4 +1,4 @@
-import { getProducts } from "../dbClient";
+import { getProducts } from "../../clients/dbClient";
 import { CategorySchema } from "../types";
 import { createResponse, parseParam, withErrorHandling } from "../utils";
 

@@ -4,8 +4,8 @@ import {
   PRESIGNED_DOWNLOAD_EXPIRE_SECONDS,
   PRESIGNED_UPLOAD_EXPIRE_SECONDS,
   PRODUCTS_BUCKET_NAME
-} from "../../src/api/constants";
-import { getDownloadUrl, getUploadUrl } from "../../src/api/s3Client";
+} from "../../src/constants";
+import { getDownloadUrl, getUploadUrl } from "../../src/clients/s3Client";
 
 // s3Client builds its S3Client at import time, and the signer needs a region and
 // credentials to resolve. hoisted() runs before that import; the key pair is

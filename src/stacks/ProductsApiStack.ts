@@ -9,7 +9,7 @@ import type { Bucket } from "aws-cdk-lib/aws-s3";
 import type { Construct } from "constructs";
 import { join } from "path";
 
-import { CORS_HEADERS } from "../api/constants";
+import { CORS_HEADERS } from "../constants";
 import { productRoutes } from "../api/products/routes";
 
 const settings = (filename: string) => ({

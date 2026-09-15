@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getProducts } from "../../../src/api/dbClient";
+import { getProducts } from "../../../src/clients/dbClient";
 import { handler } from "../../../src/api/products/getProducts";
 import { Category } from "../../../src/api/types";
 import type { Product } from "../../../src/api/types";
@@ -8,7 +8,7 @@ import { makeEvent } from "../../helpers/apiGateway";
 
 // Replaces every export of dbClient with a vi.fn(). The handler is the unit
 // under test here; whether DynamoDB is spoken to correctly is dbClient.test.ts.
-vi.mock("../../../src/api/dbClient");
+vi.mock("../../../src/clients/dbClient");
 
 const getProductsMock = vi.mocked(getProducts);
 

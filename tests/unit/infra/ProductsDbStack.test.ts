@@ -1,7 +1,7 @@
 import { Match, Template } from "aws-cdk-lib/assertions";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME } from "../../../src/api/constants";
+import { PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME } from "../../../src/constants";
 import { ProductsDbStack } from "../../../src/stacks/ProductsDbStack";
 import { makeApp } from "../../helpers/cdk";
 

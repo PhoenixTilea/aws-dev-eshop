@@ -59,6 +59,13 @@ export const startDynamoDb = async () => {
   process.env.AWS_REGION = "local";
   process.env.AWS_ACCESS_KEY_ID = "local";
   process.env.AWS_SECRET_ACCESS_KEY = "local";
+  // A profile in the ambient environment outranks the static credentials above,
+  // so the SDK would try to resolve (and refresh) real SSO credentials against a
+  // container that doesn't care. A leftover session token would likewise be paired
+  // with the fake key pair above. Drop both for the duration of the run.
+  const { AWS_PROFILE: profile, AWS_SESSION_TOKEN: sessionToken } = process.env;
+  delete process.env.AWS_PROFILE;
+  delete process.env.AWS_SESSION_TOKEN;
 
   const admin = new DynamoDBClient({ endpoint });
   const schema = productsTableSchema();
@@ -72,6 +79,8 @@ export const startDynamoDb = async () => {
       admin.destroy();
       await container.stop();
       delete process.env.AWS_ENDPOINT_URL;
+      if (profile !== undefined) process.env.AWS_PROFILE = profile;
+      if (sessionToken !== undefined) process.env.AWS_SESSION_TOKEN = sessionToken;
     }
   };
 };

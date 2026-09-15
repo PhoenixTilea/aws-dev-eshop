@@ -8,9 +8,9 @@ import {
   UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
 
-import { PRODUCTS_BUCKET_NAME, PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME as TableName } from "./constants";
-import { getDownloadUrl } from "./s3Client";
-import type { Category, Product, ProductCreateData, ProductUpdateData } from "./types";
+import { PRODUCTS_BUCKET_NAME, PRODUCTS_TABLE_CATEGORY_INDEX, PRODUCTS_TABLE_NAME as TableName } from "../constants";
+import { getDownloadUrl } from "../clients/s3Client";
+import type { Category, Product, ProductCreateData, ProductUpdateData } from "../api/types";
 
 let client: DynamoDBDocumentClient | undefined;
 

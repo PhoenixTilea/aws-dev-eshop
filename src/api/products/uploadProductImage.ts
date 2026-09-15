@@ -1,7 +1,7 @@
-import { PRODUCTS_BUCKET_NAME, PRODUCTS_IMAGE_KEY_PREFIX } from "../constants";
-import { getProduct } from "../dbClient";
+import { PRODUCTS_BUCKET_NAME, PRODUCTS_IMAGE_KEY_PREFIX } from "../../constants";
+import { getProduct } from "../../clients/dbClient";
 import { notFound } from "../errors";
-import { getUploadUrl } from "../s3Client";
+import { getUploadUrl } from "../../clients/s3Client";
 import { ProductId, UploadProductImageData } from "../types";
 import { createResponse, parseBody, parseParam, withErrorHandling } from "../utils";
 

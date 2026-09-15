@@ -2,8 +2,8 @@ import { DeleteCommand, DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { startDynamoDb } from "../helpers/dynamodb";
-import { PRODUCTS_TABLE_NAME } from "../../src/api/constants";
-import { addProduct, getProduct, getProducts, updateProduct } from "../../src/api/dbClient";
+import { PRODUCTS_TABLE_NAME } from "../../src/constants";
+import { addProduct, getProduct, getProducts, updateProduct } from "../../src/clients/dbClient";
 import { Category } from "../../src/api/types";
 import type { ProductCreateData } from "../../src/api/types";
 
