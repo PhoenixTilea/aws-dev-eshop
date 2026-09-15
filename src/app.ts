@@ -10,7 +10,10 @@ const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_
 
 const app = new cdk.App();
 const dbStack = new ProductsDbStack(app, "ProductsDbStack", { env });
-const storageStack = new ProductsStorageStack(app, "ProductsStorageStack", { productsTable: dbStack.productsTable });
+const storageStack = new ProductsStorageStack(app, "ProductsStorageStack", {
+  env,
+  productsTable: dbStack.productsTable
+});
 new ProductsApiStack(app, "ProductsApiStack", {
   env,
   productsTable: dbStack.productsTable,

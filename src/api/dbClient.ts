@@ -59,7 +59,7 @@ export const getProducts = async (category?: Category) => {
       ConsistentRead: true
     });
     const response = await docClient().send(command);
-    return response.Items ? (response.Items as Product[]) : [];
+    return response.Items ? convertProductImageUrls(response.Items as Product[]) : [];
   }
 };
 
@@ -89,17 +89,48 @@ export const updateProduct = async (id: string, product: ProductUpdateData) => {
 };
 
 export const updateProductImages = async (id: string, images: string[]) => {
+  // Sequential, one key at a time: each append is guarded by a condition on the
+  // list as it stands, so running them in parallel would let two appends race
+  // past each other's check and both land. Uploads arrive a handful at a time.
+  for (const image of new Set(images)) {
+    await addProductImage(id, image);
+  }
+};
+
+/**
+ * Appends one object key to a product's image list, skipping keys already there.
+ *
+ * S3 delivers notifications at least once, and re-uploading a file reuses its
+ * key, so the same key reaches us more than once in normal operation. The
+ * `contains` guard makes the append idempotent without a separate read.
+ *
+ * Both halves of the condition surface as the same exception, so we ask for the
+ * item back on failure to tell them apart: an item means the product exists and
+ * the key was already recorded (nothing to do), no item means the product is
+ * gone and the caller should hear about it.
+ */
+const addProductImage = async (id: string, image: string) => {
   const command = new UpdateCommand({
     TableName,
     Key: { id },
-    ConditionExpression: "attribute_exists(id)",
+    ConditionExpression: "attribute_exists(id) AND NOT contains(images, :image)",
     UpdateExpression: "SET images = list_append(if_not_exists(images, :empty), :images)",
     ExpressionAttributeValues: {
       ":empty": [],
-      ":images": images
-    }
+      ":image": image,
+      ":images": [image]
+    },
+    ReturnValuesOnConditionCheckFailure: "ALL_OLD"
   });
-  await docClient().send(command);
+
+  try {
+    await docClient().send(command);
+  } catch (err) {
+    if (err instanceof ConditionalCheckFailedException && err.Item) {
+      return;
+    }
+    throw err;
+  }
 };
 
 const convertProductImageUrls = async (products: Product[]): Promise<Product[]> => {

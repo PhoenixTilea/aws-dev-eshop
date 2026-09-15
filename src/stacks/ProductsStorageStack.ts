@@ -1,9 +1,9 @@
 import type { StackProps } from "aws-cdk-lib";
-import { Stack } from "aws-cdk-lib";
+import { RemovalPolicy, Stack } from "aws-cdk-lib";
 import type { TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { Bucket } from "aws-cdk-lib/aws-s3";
+import { Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
 import { LambdaDestination } from "aws-cdk-lib/aws-s3-notifications";
 import type { Construct } from "constructs";
 import { join } from "path";
@@ -29,7 +29,15 @@ export class ProductsStorageStack extends Stack {
 
     this.bucket = new Bucket(this, "ProductsBucket", {
       bucketName: PRODUCTS_BUCKET_NAME,
-      autoDeleteObjects: true
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      cors: [
+        {
+          allowedHeaders: ["Content-Type", "Content-Length"],
+          allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
+          allowedOrigins: ["*"]
+        }
+      ]
     });
     this.bucket.addObjectCreatedNotification(new LambdaDestination(productImageUploaded), {
       prefix: `${PRODUCTS_IMAGE_KEY_PREFIX}/`

@@ -29,20 +29,39 @@ export const Product = strictObject({
     .positive()
     .meta({ examples: [25] }),
   category: CategorySchema,
-  images: string().array().optional().meta({ description: "List of S3 object keys of images for this product." })
+  images: url().array().optional().meta({ description: "List of presigned download URLs for images for this product." })
 }).meta({ id: "Product" });
 export type Product = zInfer<typeof Product>;
 
 export const ProductList = array(Product);
 
-export const ProductCreateData = Product.omit({ id: true }).meta({ id: "ProductCreateData" });
+export const ProductCreateData = Product.omit({ id: true, images: true }).meta({ id: "ProductCreateData" });
 export type ProductCreateData = zInfer<typeof ProductCreateData>;
 
-export const ProductUpdateData = Product.omit({ id: true, category: true }).meta({ id: "ProductUpdateData" });
+export const ProductUpdateData = Product.omit({ id: true, category: true, images: true }).meta({
+  id: "ProductUpdateData"
+});
 export type ProductUpdateData = zInfer<typeof ProductUpdateData>;
 
+export const ImageContentType = zEnum(["image/gif", "image/jpeg", "image/png", "image/webp"]).meta({
+  id: "ImageContentType",
+  description: "The MIME type the browser must send as the Content-Type header when PUTting to the presigned URL."
+});
+export type ImageContentType = zInfer<typeof ImageContentType>;
+
 export const UploadProductImageData = strictObject({
-  filename: string().min(1).max(50)
+  contentType: ImageContentType,
+  filename: string()
+    .min(1)
+    .max(50)
+    .regex(/^[a-zA-Z0-9- _]+(\.[a-zA-Z0-9]+)*$/, {
+      message:
+        "File names may only container letters, numbers, dashes, hyphens, or spaces and may optionally end with a file type specifier."
+    })
+    .meta({
+      description: "The name of the file to upload, optionally with a type specifier at the end.",
+      example: "Wooden Shield.jpg"
+    })
 }).meta({ id: "UploadProductImageData" });
 export type UploadProductImageData = zInfer<typeof UploadProductImageData>;
 

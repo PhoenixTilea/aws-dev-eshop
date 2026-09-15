@@ -7,9 +7,9 @@ import { ProductId } from "../types";
 export const handler = async (event: S3Event) => {
   const productImages = new Map<string, string[]>();
   for (const { s3 } of event.Records) {
-    const key = s3.object.key;
+    const key = decodeURIComponent(s3.object.key.replace(/\+/g, " "));
     const productId = key.split("/")[1];
-    if (validate(ProductId, productId)) {
+    if (!validate(ProductId, productId)) {
       throw new Error(`Could not extract product ID from object key ${key}.`);
     }
     const list = productImages.get(productId) ?? [];

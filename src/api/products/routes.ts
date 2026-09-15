@@ -79,6 +79,7 @@ export const productRoutes: RouteContract[] = [
     method: "PUT",
     path: "/products/{id}",
     handler: "updateProduct",
+    bucketAccess: "read",
     tableAccess: "readWrite",
     operation: {
       summary: "Update a product",
