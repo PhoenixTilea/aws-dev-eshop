@@ -8,7 +8,7 @@ import { createResponse, parseBody, parseParam, withErrorHandling } from "../uti
 export const handler = withErrorHandling(async event => {
   const id = parseParam(ProductId, event.pathParameters?.id, "id");
   const { filename } = parseBody(UploadProductImageData, event);
-  const product = getProduct(id);
+  const product = await getProduct(id);
   if (!product) {
     throw notFound(`Product with ID ${id} does not exist.`);
   }

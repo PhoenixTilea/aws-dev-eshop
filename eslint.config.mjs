@@ -1,7 +1,7 @@
 import js from "@eslint/js";
+import { globalIgnores } from "eslint/config";
 import eslintConfigPrettier from "eslint-config-prettier";
 import importX from "eslint-plugin-import-x";
-import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
 // @type {import("eslint").Linter.Config[]}

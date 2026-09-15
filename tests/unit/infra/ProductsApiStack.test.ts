@@ -3,8 +3,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { CORS_HEADERS } from "../../../src/api/constants";
 import { productRoutes } from "../../../src/api/products/routes";
-import { ProductsApiStack } from "../../../src/api/ProductsApiStack";
-import { ProductsDbStack } from "../../../src/api/ProductsDbStack";
+import { ProductsApiStack } from "../../../src/stacks/ProductsApiStack";
+import { ProductsDbStack } from "../../../src/stacks/ProductsDbStack";
+import { ProductsStorageStack } from "../../../src/stacks/ProductsStorageStack";
 import { makeApp } from "../../helpers/cdk";
 
 // No snapshot for this stack: every route or handler change would churn it, and
@@ -23,7 +24,12 @@ describe("ProductsApiStack", () => {
     const app = makeApp();
     const env = { account: "123456789012", region: "eu-west-1" };
     const db = new ProductsDbStack(app, "TestProductsDbStack", { env });
-    const stack = new ProductsApiStack(app, "TestProductsApiStack", { env, productsTable: db.productsTable });
+    const storage = new ProductsStorageStack(app, "TestProductsStorageStack", { env, productsTable: db.productsTable });
+    const stack = new ProductsApiStack(app, "TestProductsApiStack", {
+      env,
+      productsBucket: storage.bucket,
+      productsTable: db.productsTable
+    });
     template = Template.fromStack(stack);
   });
 

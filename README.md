@@ -101,7 +101,7 @@ Then launch the docs server:
 # Restarts automatically when you change a route or schema
 pnpm swagger
 
-# Or write the spec to openapi.json, to import into an API client 
+# Or write the spec to openapi.json, to import into an API client
 pnpm spec
 ```
 

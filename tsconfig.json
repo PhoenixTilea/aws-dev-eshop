@@ -22,8 +22,9 @@
     "typeRoots": ["./node_modules/@types"],
     "noEmit": true,
     "isolatedModules": true,
-    "types": ["node"]
+    "types": ["node"],
+    "allowJs": true
   },
-  "include": ["src", "tests", "tools", "vitest.config.mts", "eslint.config.mjs"],
+  "include": ["src", "tests", "tools", "vitest.config.mts", "./eslint.config.mjs"],
   "exclude": ["node_modules", "cdk.out"]
 }

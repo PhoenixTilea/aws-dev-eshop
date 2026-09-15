@@ -14,7 +14,7 @@ export const getUploadUrl = (bucket: string, key: string) => {
   return getSignedUrl(client, command, {
     expiresIn: PRESIGNED_EXPIRE_MINS
   });
-}
+};
 
 export const getDownloadUrl = (bucket: string, key: string) => {
   const command = new GetObjectCommand({ Bucket: bucket, Key: key });

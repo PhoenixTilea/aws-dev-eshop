@@ -5,7 +5,7 @@ import { Template } from "aws-cdk-lib/assertions";
 import { GenericContainer, Wait } from "testcontainers";
 import type { StartedTestContainer } from "testcontainers";
 
-import { ProductsDbStack } from "../../src/api/ProductsDbStack";
+import { ProductsDbStack } from "../../src/stacks/ProductsDbStack";
 
 // Pinned so a new upstream release can't change test behaviour underneath us.
 const IMAGE = "amazon/dynamodb-local:3.3.1";

@@ -27,6 +27,7 @@ export const productRoutes: RouteContract[] = [
     method: "GET",
     path: "/products",
     handler: "getProducts",
+    bucketAccess: "read",
     tableAccess: "read",
     operation: {
       summary: "List products",
@@ -60,6 +61,7 @@ export const productRoutes: RouteContract[] = [
     method: "GET",
     path: "/products/{id}",
     handler: "getProduct",
+    bucketAccess: "read",
     tableAccess: "read",
     operation: {
       summary: "Get a product",
@@ -96,6 +98,7 @@ export const productRoutes: RouteContract[] = [
     method: "PUT",
     path: "/products/{id}/images",
     handler: "uploadProductImage",
+    bucketAccess: "put",
     tableAccess: "read",
     operation: {
       summary: "Request product image upload",

@@ -18,6 +18,7 @@ export type RouteContract = {
   method: HttpMethod;
   path: `/${string}`;
   handler: string;
+  bucketAccess?: "read" | "put";
   tableAccess: "read" | "readWrite";
   operation: Omit<ZodOpenApiOperationObject, "operationId" | "tags">;
 };

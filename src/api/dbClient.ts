@@ -40,7 +40,7 @@ export const getProduct = async (id: string) => {
     ConsistentRead: true
   });
   const response = await docClient().send(command);
-  return response.Item ? (convertProductImageUrls([response.Item as Product])) : null;
+  return response.Item ? (await convertProductImageUrls([response.Item as Product]))[0] : null;
 };
 
 export const getProducts = async (category?: Category) => {
@@ -52,7 +52,7 @@ export const getProducts = async (category?: Category) => {
       ExpressionAttributeValues: { ":c": category }
     });
     const response = await docClient().send(command);
-    return response.Items ? (convertProductImageUrls(response.Items as Product[])) : [];
+    return response.Items ? convertProductImageUrls(response.Items as Product[]) : [];
   } else {
     const command = new ScanCommand({
       TableName,
@@ -79,7 +79,7 @@ export const updateProduct = async (id: string, product: ProductUpdateData) => {
 
   try {
     const response = await docClient().send(command);
-    return convertProductImageUrls([response.Attributes as Product]);
+    return (await convertProductImageUrls([response.Attributes as Product]))[0];
   } catch (err) {
     if (err instanceof ConditionalCheckFailedException) {
       return null;
@@ -100,10 +100,10 @@ export const updateProductImages = async (id: string, images: string[]) => {
     }
   });
   await docClient().send(command);
-}
+};
 
-const convertProductImageUrls = async (products: Product[]) => {
-  const promises: (() => Promise<{ id: string, url: string }>)[] = [];
+const convertProductImageUrls = async (products: Product[]): Promise<Product[]> => {
+  const promises: (() => Promise<{ id: string; url: string }>)[] = [];
   for (const product of products) {
     if (!product.images?.length) {
       continue;
@@ -125,6 +125,6 @@ const convertProductImageUrls = async (products: Product[]) => {
 
   return products.map(p => ({
     ...p,
-    images: productDownloadUrls.get(p.id) ?? []
+    images: productDownloadUrls.get(p.id)
   }));
-}
+};

@@ -5,6 +5,7 @@ import { LambdaIntegration, ResponseType, RestApi } from "aws-cdk-lib/aws-apigat
 import type { TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import type { Bucket } from "aws-cdk-lib/aws-s3";
 import type { Construct } from "constructs";
 import { join } from "path";
 
@@ -12,7 +13,7 @@ import { CORS_HEADERS } from "../api/constants";
 import { productRoutes } from "../api/products/routes";
 
 const settings = (filename: string) => ({
-  entry: join(__dirname, "products", `${filename}.ts`),
+  entry: join(__dirname, "..", "api", "products", `${filename}.ts`),
   handler: "handler",
   runtime: Runtime.NODEJS_24_X
 });
@@ -20,6 +21,7 @@ const settings = (filename: string) => ({
 const constructId = (handler: string) => `${handler.charAt(0).toUpperCase()}${handler.slice(1)}`;
 
 type Props = StackProps & {
+  productsBucket: Bucket;
   productsTable: TableV2;
 };
 
@@ -27,7 +29,7 @@ export class ProductsApiStack extends Stack {
   constructor(scope: Construct, id: string, props: Props) {
     super(scope, id, props);
 
-    const { productsTable } = props;
+    const { productsBucket, productsTable } = props;
 
     const api = new RestApi(this, "ProductsApi", {
       deployOptions: {
@@ -48,6 +50,11 @@ export class ProductsApiStack extends Stack {
         productsTable.grants.readWriteData(fn);
       } else {
         productsTable.grants.readData(fn);
+      }
+      if (route.bucketAccess === "read") {
+        productsBucket.grants.read(fn);
+      } else if (route.bucketAccess === "put") {
+        productsBucket.grants.put(fn);
       }
 
       const resource = api.root.resourceForPath(route.path);
